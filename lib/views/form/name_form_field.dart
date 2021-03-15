@@ -3,12 +3,11 @@
 * this class is responsible for validating the name input 
 * and how the textbox is presented
 */
-
 import 'package:flutter/material.dart';
 
 class NameFormField extends StatelessWidget {
   // one to unlimited alphabetical and space characters
-  final String namePattern = "^[a-zA-Z ]+";
+  final String namePattern = r"^[a-zA-Z ]+";
   // error message for empty name
   final String emptyErrorMessage = "Error: Name can't be empty";
 
@@ -21,7 +20,13 @@ class NameFormField extends StatelessWidget {
 
   final TextEditingController textController = TextEditingController();
 
-  NameFormField({Key key}) : super(key: key);
+  final String _initialName;
+
+  NameFormField.withIntialName(this._initialName);
+
+  NameFormField({Key key})
+      : _initialName = null,
+        super(key: key);
 
   String _validateName(String name) {
     RegExp regex = RegExp(namePattern);
@@ -42,7 +47,7 @@ class NameFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        controller: textController,
+        controller: textController..text = _initialName,
         decoration: InputDecoration(
           labelText: _label,
           helperText: _helperText,

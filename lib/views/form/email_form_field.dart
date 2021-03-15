@@ -17,7 +17,13 @@ class EmailFormField extends StatelessWidget {
 
   final TextEditingController _textController = TextEditingController();
 
-  EmailFormField({Key key}) : super(key: key);
+  final String _initialEmail;
+
+  EmailFormField({Key key})
+      : _initialEmail = null,
+        super(key: key);
+
+  EmailFormField.withInitialEmail(this._initialEmail);
 
   String _validateEmail(String email) {
     RegExp regex = RegExp(_emailPattern);
@@ -36,7 +42,7 @@ class EmailFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: _textController,
+      controller: _textController..text = _initialEmail,
       decoration: InputDecoration(
         labelText: _label,
         helperText: _helperText,

@@ -4,38 +4,45 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:secret_santa_app/models/household.dart';
 
+// ignore: must_be_immutable
 class HouseholdDropdown extends StatefulWidget {
-  // TODO replace with real list of households
-  final List<Household> _households;
+  final List<String> _households;
+  final String _initialHousehold;
   _HouseholdDropdownState _state;
-  HouseholdDropdown(this._households, {Key key}) : super(key: key);
+
+  HouseholdDropdown(this._households, {Key key})
+      : _initialHousehold = _households[0],
+        super(key: key);
+
+  HouseholdDropdown.withInitialHousehold(
+      this._households, this._initialHousehold);
 
   @override
   _HouseholdDropdownState createState() {
-    this._state = new _HouseholdDropdownState();
+    this._state = new _HouseholdDropdownState(_initialHousehold);
     return this._state;
   }
 
-  Household get selectedHousehold {
+  String get selectedHousehold {
     return this._state._selectedHousehold;
   }
 }
 
 class _HouseholdDropdownState extends State<HouseholdDropdown> {
-  Household _selectedHousehold;
+  String _selectedHousehold;
+
+  _HouseholdDropdownState(this._selectedHousehold);
 
   List<DropdownMenuItem> _dropdownItems = [];
 
   @override
   void initState() {
     super.initState();
-    this._selectedHousehold = widget._households[0];
     // add dropdown items to the list
-    for (Household household in widget._households) {
-      _dropdownItems.add(new DropdownMenuItem(
-          value: household, child: Text(household.household)));
+    for (String household in widget._households) {
+      _dropdownItems
+          .add(new DropdownMenuItem(value: household, child: Text(household)));
     }
   }
 

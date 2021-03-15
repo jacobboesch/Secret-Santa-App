@@ -45,10 +45,19 @@ class HomeScreen extends StatelessWidget {
   Widget _participantItemBuilder(
       BuildContext context, Participant participant) {
     return ListTile(
-        // adds 64dp of padding to the left of each list item
-        contentPadding: const EdgeInsets.only(left: 64.0),
-        title: Text(participant.name),
-        subtitle: Text(participant.email));
+      // adds 64dp of padding to the left of each list item
+      contentPadding: const EdgeInsets.only(left: 64.0),
+      title: Text(participant.name),
+      subtitle: Text(participant.email),
+      // navigate to participant screen
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ParticipantScreen.withParticipant(participant)));
+      },
+    );
   }
 
   // returns household list item
