@@ -4,21 +4,13 @@
 * as well as deleting the participant
 */
 import 'package:flutter/material.dart';
+import '../views/form/name_form_field.dart';
 
 class ParticipantScreen extends StatelessWidget {
   // constants
   final String title = "Participant";
-  final TextEditingController textController = TextEditingController();
-  // state of our participant form used to validate all fields of the form
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
-
-  String _validateName(String value) {
-    if (value.length < 2) {
-      return "Error Name Can't Be Empty";
-    } else {
-      return null;
-    }
-  }
+  final NameFormField nameField = new NameFormField();
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +42,7 @@ class ParticipantScreen extends StatelessWidget {
                       // Name field
                       Expanded(
                         child: Padding(
-                          child: TextFormField(
-                              controller: textController,
-                              decoration: InputDecoration(
-                                labelText: "Name",
-                                helperText: "*Required",
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: _validateName),
+                          child: nameField,
                           padding: EdgeInsets.only(top: 16),
                         ),
                         flex: 4,
@@ -79,7 +64,7 @@ class ParticipantScreen extends StatelessWidget {
                             // TODO replace with save button
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(textController.text)));
+                                SnackBar(content: Text(nameField.name)));
                           },
                           icon: Icon(Icons.save),
                           label: Text("Save"))
