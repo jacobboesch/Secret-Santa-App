@@ -15,9 +15,9 @@ class NameFormField extends StatelessWidget {
   final String invalidNameMessage =
       "Error: Name can only contain alphabetical characters";
 
-  final String label = "Name";
+  final String _label = "Name";
 
-  final String helperText = "*Required";
+  final String _helperText = "*Required";
 
   final TextEditingController textController = TextEditingController();
 
@@ -28,7 +28,7 @@ class NameFormField extends StatelessWidget {
     // first check if the name is empty
     if (name.isEmpty) {
       return emptyErrorMessage;
-    } else if (regex.hasMatch(name)) {
+    } else if (!regex.hasMatch(name)) {
       return invalidNameMessage;
     }
     // if everything is good return null
@@ -44,8 +44,8 @@ class NameFormField extends StatelessWidget {
     return TextFormField(
         controller: textController,
         decoration: InputDecoration(
-          labelText: label,
-          helperText: helperText,
+          labelText: _label,
+          helperText: _helperText,
           border: OutlineInputBorder(),
         ),
         validator: _validateName);

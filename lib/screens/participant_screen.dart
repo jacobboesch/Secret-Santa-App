@@ -4,13 +4,23 @@
 * as well as deleting the participant
 */
 import 'package:flutter/material.dart';
-import '../views/form/name_form_field.dart';
+import 'package:secret_santa_app/models/household.dart';
+import 'package:secret_santa_app/views/form/email_form_field.dart';
+import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
+import 'package:secret_santa_app/views/layout/one_column_layout.dart';
+import 'package:secret_santa_app/views/form/name_form_field.dart';
 
 class ParticipantScreen extends StatelessWidget {
   // constants
   final String title = "Participant";
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
-  final NameFormField nameField = new NameFormField();
+  final NameFormField _nameField = new NameFormField();
+  final EmailFormField _emailField = new EmailFormField();
+  final HouseholdDropdown _householdDropdown = HouseholdDropdown([
+    Household("Home"),
+    Household("Cousins House"),
+    Household("Grandma's House")
+  ]);
 
   @override
   Widget build(BuildContext context) {
@@ -27,49 +37,9 @@ class ParticipantScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 // participant form
                 children: [
-                  // Name field
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // white space
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                        ),
-                        flex: 1,
-                      ),
-                      // Name field
-                      Expanded(
-                        child: Padding(
-                          child: nameField,
-                          padding: EdgeInsets.only(top: 16),
-                        ),
-                        flex: 4,
-                      ),
-                      // whitespace
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                        ),
-                        flex: 1,
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton.icon(
-                          onPressed: () {
-                            // TODO replace with save button
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(nameField.name)));
-                          },
-                          icon: Icon(Icons.save),
-                          label: Text("Save"))
-                    ],
-                  )
+                  OneColumnLayout(_nameField),
+                  OneColumnLayout(_emailField),
+                  OneColumnLayout(_householdDropdown)
                 ])));
   }
 }
