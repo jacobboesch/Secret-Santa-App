@@ -1,7 +1,7 @@
 class Participant {
   int _id;
   String _name;
-  int _household;
+  String _household;
   String _email;
 
   // Constructors
@@ -26,11 +26,11 @@ class Participant {
     this._name = name;
   }
 
-  int get household {
+  String get household {
     return this._household;
   }
 
-  set household(int household) {
+  set household(String household) {
     this._household = household;
   }
 
