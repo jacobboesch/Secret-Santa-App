@@ -12,8 +12,8 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/screens/household_screen.dart';
 import 'package:secret_santa_app/screens/participant_screen.dart';
-import '../models/participant.dart';
-import '../models/household.dart';
+import 'package:secret_santa_app/models/participant.dart';
+import 'package:secret_santa_app/models/household.dart';
 
 final List<Participant> _participants = [
   Participant.withoutId("Jacob", "Home", "jacobtboesch@gmail.com"),
@@ -63,8 +63,16 @@ class HomeScreen extends StatelessWidget {
   // returns household list item
   Widget _householdItemBuilder(BuildContext context, int index) {
     return ListTile(
-        contentPadding: const EdgeInsets.only(left: 32),
-        title: Text(_households[index].household));
+      contentPadding: const EdgeInsets.only(left: 32),
+      title: Text(_households[index].household),
+      onTap: () => {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HouseholdScreen.withHousehold(
+                    _households[index].household)))
+      },
+    );
   }
 
   // returns a divider for the prticipant list based on the house hold

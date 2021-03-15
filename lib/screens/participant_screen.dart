@@ -4,7 +4,6 @@
 * as well as deleting the participant
 */
 import 'package:flutter/material.dart';
-import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/models/participant.dart';
 import 'package:secret_santa_app/views/form/email_form_field.dart';
 import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
@@ -19,6 +18,12 @@ class ParticipantScreen extends StatelessWidget {
   final EmailFormField _emailField;
   final HouseholdDropdown _householdDropdown;
   final bool _editMode;
+
+  final String _deleteConfirmationTitle = "Delete participant?";
+  final String _deleteConfirmationHelperText =
+      "The participant will be permanently removed from the list of participants";
+  final String _deleteConfirmationCancelText = "CANCEL";
+  final String _deleteConfirmationConfirmText = "DELETE";
 
   static final _households = ["Home", "Cousins House", "Grandma's House"];
 
@@ -43,6 +48,28 @@ class ParticipantScreen extends StatelessWidget {
 
   void _deleteParticipant(BuildContext context) {
     // TODO wrie code for delete participant
+    Navigator.pop(context);
+  }
+
+  // called when the delete button is pressed
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(_deleteConfirmationTitle),
+              content: Text(_deleteConfirmationHelperText),
+              actions: [
+                TextButton(
+                    onPressed: () => {Navigator.pop(context)},
+                    child: Text(_deleteConfirmationCancelText)),
+                TextButton(
+                    onPressed: () => {
+                          // TODO replace with async call
+                          _deleteParticipant(context)
+                        },
+                    child: Text(_deleteConfirmationConfirmText))
+              ],
+            ));
   }
 
   @override
@@ -58,7 +85,7 @@ class ParticipantScreen extends StatelessWidget {
                 Padding(
                     padding: EdgeInsets.only(right: 20),
                     child: GestureDetector(
-                      onTap: () => {},
+                      onTap: () => {_confirmDelete(context)},
                       child: Icon(Icons.delete_forever, size: 26),
                     ))
               ]

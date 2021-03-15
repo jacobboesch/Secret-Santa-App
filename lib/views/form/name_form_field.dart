@@ -5,6 +5,7 @@
 */
 import 'package:flutter/material.dart';
 
+//TODO FIX VALIDATION SINCE IT'S NOT WORKING
 class NameFormField extends StatelessWidget {
   // one to unlimited alphabetical and space characters
   final String namePattern = r"^[a-zA-Z ]+";
