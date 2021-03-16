@@ -13,6 +13,11 @@ class Participant {
         json["id"], json["name"], json["household"], json["email"]);
   }
 
+  // Convert particpant to map
+  Map<String, dynamic> toMap() {
+    return {'id': _id, 'name': _name, 'household': _household, 'email': _email};
+  }
+
   // getters and setters
   int get id {
     return this._id;
