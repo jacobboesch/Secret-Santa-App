@@ -54,7 +54,7 @@ class ParticipantScreen extends StatelessWidget {
     // TODO write code to save the participant
     participant = new Participant.withoutId(_nameField.name,
         _householdDropdown.selectedHousehold, _emailField.email);
-    participantService.createParticipant(participant);
+    participantService.create(participant);
     // show that participant saved
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Participant Saved")));

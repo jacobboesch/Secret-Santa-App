@@ -28,7 +28,7 @@ class EmailFormField extends StatelessWidget {
   String _validateEmail(String email) {
     RegExp regex = RegExp(_emailPattern);
 
-    if (!regex.hasMatch(email)) {
+    if (!(regex.stringMatch(email) == email)) {
       return _errorMessage;
     }
     // if email is valid return null

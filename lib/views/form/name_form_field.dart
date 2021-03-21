@@ -5,15 +5,13 @@
 */
 import 'package:flutter/material.dart';
 
-//TODO FIX VALIDATION SINCE IT'S NOT WORKING
 class NameFormField extends StatelessWidget {
   // one to unlimited alphabetical and space characters
   final String namePattern = r"^[a-zA-Z ]+";
   // error message for empty name
   final String emptyErrorMessage = "Error: Name can't be empty";
 
-  final String invalidNameMessage =
-      "Error: Name can only contain alphabetical characters";
+  final String invalidNameMessage = "Error: Only alphabetical allowed";
 
   final String _label = "Name";
 
@@ -31,10 +29,11 @@ class NameFormField extends StatelessWidget {
 
   String _validateName(String name) {
     RegExp regex = RegExp(namePattern);
+
     // first check if the name is empty
     if (name.isEmpty) {
       return emptyErrorMessage;
-    } else if (!regex.hasMatch(name)) {
+    } else if (!(regex.stringMatch(name) == name)) {
       return invalidNameMessage;
     }
     // if everything is good return null

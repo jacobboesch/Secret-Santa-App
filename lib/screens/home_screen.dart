@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // retrives a list of participants then updates the screen with the list
   // method is called asyncronously so that it's on it's own thread.
   Future<void> updateParticipantList() async {
-    _participants = await _participantService.fetchParticipants();
+    _participants = await _participantService.fetchAll();
     // refresh the screen
     setState(() {});
   }
