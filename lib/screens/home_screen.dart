@@ -14,17 +14,7 @@ import 'package:secret_santa_app/screens/household_screen.dart';
 import 'package:secret_santa_app/screens/participant_screen.dart';
 import 'package:secret_santa_app/models/participant.dart';
 import 'package:secret_santa_app/models/household.dart';
-
-final List<Participant> _participants = [
-  Participant.withoutId("Jacob", "Home", "jacobtboesch@gmail.com"),
-  Participant.withoutId("James", "Cousins House", "james@example.com"),
-  Participant.withoutId("Jessica", "Cousins House", "Jessica@example.com"),
-  Participant.withoutId("Julie", "Cousins House", "julie@example.com"),
-  Participant.withoutId("Grandma", "Grandma's House", "Grandma@example.com"),
-  Participant.withoutId("Grandpa", "Grandma's House", "Grandpa@example.com"),
-  Participant.withoutId("Mom", "Home", "mom@example.com"),
-  Participant.withoutId("Jeremy", "Home", "jeremy@example.com")
-];
+import 'package:secret_santa_app/services/participant_service.dart';
 
 final List<Household> _households = [
   Household("Home"),
@@ -32,14 +22,47 @@ final List<Household> _households = [
   Household("Grandma's House")
 ];
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   // constants
   final String title = "Secret Santa App";
   final String participantTabTitle = "Participants";
   final String householdTabTitle = "Households";
+  List<Participant> _participants = [];
+  final ParticipantService _participantService = ParticipantService();
   // tab index
   static const int PARTICIPANT_TAB_INDEX = 0;
   static const int HOUSEHOLD_TAB_INDEX = 1;
+
+  _HomeScreenState() {
+    updateParticipantList();
+  }
+
+  // retrives a list of participants then updates the screen with the list
+  // method is called asyncronously so that it's on it's own thread.
+  Future<void> updateParticipantList() async {
+    _participants = await _participantService.fetchParticipants();
+    // refresh the screen
+    setState(() {});
+  }
+
+  // called when participant item is tapped
+  void _onParticipantItemTaped(
+      BuildContext context, Participant participant) async {
+    // navigate to participant screen sending participant information
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ParticipantScreen.withParticipant(participant)));
+    // refresh the list of participants
+    updateParticipantList();
+  }
 
   // participant list item view
   Widget _participantItemBuilder(
@@ -51,11 +74,7 @@ class HomeScreen extends StatelessWidget {
       subtitle: Text(participant.email),
       // navigate to participant screen
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    ParticipantScreen.withParticipant(participant)));
+        _onParticipantItemTaped(context, participant);
       },
     );
   }
@@ -96,13 +115,16 @@ class HomeScreen extends StatelessWidget {
   // called when the create button is tapped on either tab
   // determines weather to create a participant or household and takes
   // the user to the approprate screen
-  void _onCreateButtonTapped(BuildContext context) {
+  void _onCreateButtonTapped(BuildContext context) async {
     // determine which tab we're on
     int tabIndex = DefaultTabController.of(context).index;
     if (tabIndex == PARTICIPANT_TAB_INDEX) {
       // navigate to the participant screen
-      Navigator.push(context,
+      // and wait for the return
+      await Navigator.push(context,
           MaterialPageRoute(builder: (context) => ParticipantScreen()));
+      // when we return from the participant screen refresh the list of participants
+      updateParticipantList();
     } else {
       // navigate to the household screen
       Navigator.push(
@@ -118,8 +140,6 @@ class HomeScreen extends StatelessWidget {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Send Email Button Cliked")));
   }
-
-  HomeScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

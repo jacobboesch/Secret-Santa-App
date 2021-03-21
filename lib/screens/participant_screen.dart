@@ -5,6 +5,7 @@
 */
 import 'package:flutter/material.dart';
 import 'package:secret_santa_app/models/participant.dart';
+import 'package:secret_santa_app/services/participant_service.dart';
 import 'package:secret_santa_app/views/form/email_form_field.dart';
 import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
 import 'package:secret_santa_app/views/layout/one_column_layout.dart';
@@ -25,7 +26,11 @@ class ParticipantScreen extends StatelessWidget {
   final String _deleteConfirmationCancelText = "CANCEL";
   final String _deleteConfirmationConfirmText = "DELETE";
 
+  final ParticipantService participantService = ParticipantService();
+
   static final _households = ["Home", "Cousins House", "Grandma's House"];
+
+  Participant participant;
 
   ParticipantScreen({Key key})
       : _editMode = false,
@@ -39,16 +44,26 @@ class ParticipantScreen extends StatelessWidget {
         _nameField = NameFormField.withIntialName(participant.name),
         _emailField = EmailFormField.withInitialEmail(participant.email),
         _householdDropdown = HouseholdDropdown.withInitialHousehold(
-            _households, participant.household);
+            _households, participant.household) {
+    this.participant = participant;
+  }
 
   // Saves the current participant
   void _saveParticipant(BuildContext context) {
+    // TODO add error checking
     // TODO write code to save the participant
+    participant = new Participant.withoutId(_nameField.name,
+        _householdDropdown.selectedHousehold, _emailField.email);
+    participantService.createParticipant(participant);
+    // show that participant saved
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Participant Saved")));
+    // return back to the home screen
+    Navigator.pop(context, true);
   }
 
   void _deleteParticipant(BuildContext context) {
     // TODO wrie code for delete participant
-    Navigator.pop(context);
   }
 
   // called when the delete button is pressed
