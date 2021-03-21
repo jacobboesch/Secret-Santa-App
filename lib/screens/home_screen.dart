@@ -88,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
             builder: (context) => HouseholdScreen.withHousehold(household)));
     updateHouseholdList();
+    updateParticipantList();
   }
 
   // returns household list item
@@ -137,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await Navigator.push(
           context, MaterialPageRoute(builder: (context) => HouseholdScreen()));
       updateHouseholdList();
+      updateParticipantList();
     }
   }
 

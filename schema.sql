@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS participants(
     name VARCHAR(128) NOT NULL,
     household INT NOT NULL,
     email VARCHAR(320) NOT NULL,
-    FOREIGN KEY(household) REFERENCES households(id)
+    FOREIGN KEY(household) REFERENCES households(id) 
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS participant_households(
@@ -29,9 +31,6 @@ CREATE TABLE IF NOT EXISTS giftee_history(
     FOREIGN KEY(participant) REFERENCES participants(id),
     FOREIGN KEY(giftee) REFERENCES participants(id)
 );
-
--- insert statement for participant
-
 
 -- participant view and rules
 CREATE VIEW vw_participants AS SELECT P.id, P.name, H.household, P.email FROM participants AS P,households AS H WHERE H.id = P.household;

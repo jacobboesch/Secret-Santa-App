@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/services/household_service.dart';
 import 'package:secret_santa_app/views/layout/one_column_layout.dart';
+import 'package:sqflite/sqflite.dart';
 
 class HouseholdScreen extends StatelessWidget {
   final String _emptyErrorMessage = "Error: household can't be empty";
@@ -17,7 +18,7 @@ class HouseholdScreen extends StatelessWidget {
 
   final String _deleteConfirmationTitle = "Delete household?";
   final String _deleteConfirmationHelperText =
-      "The household will be permanently removed from the list of households";
+      "The household will be permanently removed from the list of households, Along with any participants that live in this household.";
   final String _deleteConfirmationCancelText = "CANCEL";
   final String _deleteConfirmationConfirmText = "DELETE";
   final HouseholdService householdService = HouseholdService();
@@ -50,6 +51,18 @@ class HouseholdScreen extends StatelessWidget {
         }
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Household saved")));
+      } on DatabaseException catch (e) {
+        // if the error is that a unqiue contraint is voilated then
+        // we know that for this table it's becuase there's already a household
+        // with the same name
+        if (e.getResultCode() == 2067) {
+          // Since the household already exists we'll just inform the user
+          // that the household is saved. No need for an error message
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("Household saved")));
+        } else {
+          _displayUnexpectedErrorMessage(context);
+        }
       } catch (e) {
         print(e);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -67,14 +80,17 @@ class HouseholdScreen extends StatelessWidget {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Household Deleted")));
     } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Unexpected Error Deleting Household")));
+      _displayUnexpectedErrorMessage(context);
     }
     // Pop to get out of dialog
     Navigator.pop(context);
     // Pop again to get back to home screen
     Navigator.pop(context);
+  }
+
+  void _displayUnexpectedErrorMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Unexpected Error Deleting Household")));
   }
 
   // called when the delete button is pressed
@@ -91,10 +107,7 @@ class HouseholdScreen extends StatelessWidget {
                     onPressed: () => {Navigator.pop(context)},
                     child: Text(_deleteConfirmationCancelText)),
                 TextButton(
-                    onPressed: () => {
-                          // TODO replace this with delete function
-                          _deleteHousehold(context)
-                        },
+                    onPressed: () => {_deleteHousehold(context)},
                     child: Text(_deleteConfirmationConfirmText))
               ],
             ));
