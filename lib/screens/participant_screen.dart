@@ -56,7 +56,6 @@ class ParticipantScreen extends StatelessWidget {
     if (_key.currentState.validate()) {
       // update the participant object with information from the form
       _setParticipantFields();
-      // TODO add error handling for if there is an error in the database
       // if the participant already has an id then we need to update it
       try {
         if (_participant.id != 0) {

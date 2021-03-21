@@ -2,6 +2,9 @@
 * This screen allows the user to define a new household
 */
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:secret_santa_app/models/household.dart';
+import 'package:secret_santa_app/services/household_service.dart';
 import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
 import 'package:secret_santa_app/views/layout/one_column_layout.dart';
 
@@ -12,20 +15,23 @@ class HouseholdScreen extends StatelessWidget {
   final String _helperText = "*Required";
 
   final bool _editEnabled;
-  final String _initialHousehold;
+  final Household _household;
 
   final String _deleteConfirmationTitle = "Delete household?";
   final String _deleteConfirmationHelperText =
       "The household will be permanently removed from the list of households";
   final String _deleteConfirmationCancelText = "CANCEL";
   final String _deleteConfirmationConfirmText = "DELETE";
+  final HouseholdService householdService = HouseholdService();
+
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
 
   HouseholdScreen({Key key})
       : _editEnabled = false,
-        _initialHousehold = null,
+        _household = Household(0, ""),
         super(key: key);
 
-  HouseholdScreen.withHousehold(this._initialHousehold) : _editEnabled = true;
+  HouseholdScreen.withHousehold(this._household) : _editEnabled = true;
 
   // validator for the household
   String _validateHouseHold(String household) {
@@ -33,6 +39,45 @@ class HouseholdScreen extends StatelessWidget {
       return _emptyErrorMessage;
     }
     return null;
+  }
+
+  // TODO fix this method it's not incrementing the hosuehold id on insert
+  void _saveHousehold(BuildContext context) async {
+    if (_key.currentState.validate()) {
+      _household.household = _textController.text;
+      try {
+        if (_household.id != 0) {
+          await householdService.update(_household);
+        } else {
+          await householdService.create(_household);
+        }
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Household saved")));
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Unexpected Error Saving Household")));
+      }
+      Navigator.pop(context);
+    }
+  }
+
+  // TODO add error message or CASCADE when household is deleted and there's still
+  // participants in need of that house hold
+  void _deleteHousehold(BuildContext context) async {
+    try {
+      await householdService.delete(_household);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Household Deleted")));
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unexpected Error Deleting Household")));
+    }
+    // Pop to get out of dialog
+    Navigator.pop(context);
+    // Pop again to get back to home screen
+    Navigator.pop(context);
   }
 
   // called when the delete button is pressed
@@ -51,7 +96,7 @@ class HouseholdScreen extends StatelessWidget {
                 TextButton(
                     onPressed: () => {
                           // TODO replace this with delete function
-                          Navigator.pop(context)
+                          _deleteHousehold(context)
                         },
                     child: Text(_deleteConfirmationConfirmText))
               ],
@@ -61,37 +106,54 @@ class HouseholdScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Household"),
-          actions: _editEnabled
-              ? [
-                  // Delete button
-                  // Only shows up in edit mode
-                  Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: GestureDetector(
-                        onTap: () => {_confirmDelete(context)},
-                        child: Icon(Icons.delete_forever, size: 26),
-                      ))
-                ]
-              : null,
+      appBar: AppBar(
+        title: Text("Household"),
+        actions: _editEnabled
+            ? [
+                // Delete button
+                // Only shows up in edit mode
+                Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: GestureDetector(
+                      onTap: () => {_confirmDelete(context)},
+                      child: Icon(Icons.delete_forever, size: 26),
+                    ))
+              ]
+            : null,
+      ),
+      body: Form(
+        key: _key,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Household field
+            OneColumnLayout(TextFormField(
+              controller: _textController..text = _household.household,
+              decoration: InputDecoration(
+                  labelText: _label,
+                  helperText: _helperText,
+                  border: OutlineInputBorder()),
+              validator: _validateHouseHold,
+            ))
+          ],
         ),
-        body: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Household field
-              OneColumnLayout(TextFormField(
-                controller: _textController..text = _initialHousehold,
-                decoration: InputDecoration(
-                    labelText: _label,
-                    helperText: _helperText,
-                    border: OutlineInputBorder()),
-                validator: _validateHouseHold,
-              ))
-            ],
-          ),
-        ));
+      ),
+      bottomSheet: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: ElevatedButton.icon(
+                onPressed: () {
+                  _saveHousehold(context);
+                },
+                icon: Icon(Icons.save),
+                label: Text("SAVE")),
+          )
+        ],
+      ),
+    );
   }
 }

@@ -13,14 +13,8 @@ import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/screens/household_screen.dart';
 import 'package:secret_santa_app/screens/participant_screen.dart';
 import 'package:secret_santa_app/models/participant.dart';
-import 'package:secret_santa_app/models/household.dart';
+import 'package:secret_santa_app/services/household_service.dart';
 import 'package:secret_santa_app/services/participant_service.dart';
-
-final List<Household> _households = [
-  Household("Home"),
-  Household("Cousins House"),
-  Household("Grandma's House")
-];
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -34,13 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
   final String participantTabTitle = "Participants";
   final String householdTabTitle = "Households";
   List<Participant> _participants = [];
+  List<Household> _households = [];
+
   final ParticipantService _participantService = ParticipantService();
+  final HouseholdService _householdService = HouseholdService();
   // tab index
   static const int PARTICIPANT_TAB_INDEX = 0;
   static const int HOUSEHOLD_TAB_INDEX = 1;
 
   _HomeScreenState() {
     updateParticipantList();
+    updateHouseholdList();
   }
 
   // retrives a list of participants then updates the screen with the list
@@ -48,6 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> updateParticipantList() async {
     _participants = await _participantService.fetchAll();
     // refresh the screen
+    setState(() {});
+  }
+
+  Future<void> updateHouseholdList() async {
+    _households = await _householdService.fetchAll();
     setState(() {});
   }
 
@@ -79,18 +82,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _onHouseholdItemTapped(Household household) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HouseholdScreen.withHousehold(household)));
+    updateHouseholdList();
+  }
+
   // returns household list item
   Widget _householdItemBuilder(BuildContext context, int index) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 32),
       title: Text(_households[index].household),
-      onTap: () => {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => HouseholdScreen.withHousehold(
-                    _households[index].household)))
-      },
+      onTap: () => {_onHouseholdItemTapped(_households[index])},
     );
   }
 
@@ -127,8 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
       updateParticipantList();
     } else {
       // navigate to the household screen
-      Navigator.push(
+      await Navigator.push(
           context, MaterialPageRoute(builder: (context) => HouseholdScreen()));
+      updateHouseholdList();
     }
   }
 
