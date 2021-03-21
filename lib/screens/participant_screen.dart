@@ -52,23 +52,28 @@ class ParticipantScreen extends StatelessWidget {
   }
 
   // Saves the current participant
-  void _saveParticipant(BuildContext context) {
+  void _saveParticipant(BuildContext context) async {
     if (_key.currentState.validate()) {
       // update the participant object with information from the form
       _setParticipantFields();
       // TODO add error handling for if there is an error in the database
       // if the participant already has an id then we need to update it
-      if (_participant.id != 0) {
-        participantService.update(_participant);
+      try {
+        if (_participant.id != 0) {
+          await participantService.update(_participant);
+        }
+        // if there is no id then we need to create the participant
+        else {
+          await participantService.create(_participant);
+        }
+        // show that participant saved
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Participant Saved")));
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Unexpected Error Saving Participant")));
       }
-      // if there is no id then we need to create the participant
-      else {
-        participantService.create(_participant);
-      }
-
-      // show that participant saved
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Participant Saved")));
       // return back to the home screen
       Navigator.pop(context);
     } else {
@@ -90,11 +95,16 @@ class ParticipantScreen extends StatelessWidget {
         .showSnackBar(SnackBar(content: Text("Please fix invalid fields")));
   }
 
-  void _deleteParticipant(BuildContext context) {
-    // TODO add error handling
-    participantService.delete(_participant);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Participant Deleted")));
+  void _deleteParticipant(BuildContext context) async {
+    try {
+      await participantService.delete(_participant);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Participant Deleted")));
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unexpected Error Deleting Participant")));
+    }
     // get out of the dialog
     Navigator.pop(context);
     // pop again to get back to the home screen
