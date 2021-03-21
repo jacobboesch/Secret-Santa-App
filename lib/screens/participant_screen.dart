@@ -11,6 +11,7 @@ import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
 import 'package:secret_santa_app/views/layout/one_column_layout.dart';
 import 'package:secret_santa_app/views/form/name_form_field.dart';
 
+// ignore: must_be_immutable
 class ParticipantScreen extends StatelessWidget {
   // constants
   final String title = "Participant";
@@ -30,14 +31,16 @@ class ParticipantScreen extends StatelessWidget {
 
   static final _households = ["Home", "Cousins House", "Grandma's House"];
 
-  Participant participant;
+  Participant _participant;
 
   ParticipantScreen({Key key})
       : _editMode = false,
         _nameField = NameFormField(),
         _emailField = EmailFormField(),
         _householdDropdown = HouseholdDropdown(_households),
-        super(key: key);
+        super(key: key) {
+    this._participant = Participant(0, "", "", "");
+  }
 
   ParticipantScreen.withParticipant(Participant participant)
       : _editMode = true,
@@ -45,21 +48,45 @@ class ParticipantScreen extends StatelessWidget {
         _emailField = EmailFormField.withInitialEmail(participant.email),
         _householdDropdown = HouseholdDropdown.withInitialHousehold(
             _households, participant.household) {
-    this.participant = participant;
+    this._participant = participant;
   }
 
   // Saves the current participant
   void _saveParticipant(BuildContext context) {
-    // TODO add error checking
-    // TODO write code to save the participant
-    participant = new Participant.withoutId(_nameField.name,
-        _householdDropdown.selectedHousehold, _emailField.email);
-    participantService.create(participant);
-    // show that participant saved
+    if (_key.currentState.validate()) {
+      // update the participant object with information from the form
+      _setParticipantFields();
+      // if the participant already has an id then we need to update it
+      if (_participant.id != 0) {
+        participantService.update(_participant);
+      }
+      // if there is no id then we need to create the participant
+      else {
+        participantService.create(_participant);
+      }
+
+      // show that participant saved
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Participant Saved")));
+      // return back to the home screen
+      Navigator.pop(context, true);
+    } else {
+      _displayInvalidFormMessage(context);
+    }
+  }
+
+  // updates the participant object to contain information from the form
+  void _setParticipantFields() {
+    this._participant.email = _emailField.email;
+    this._participant.household = _householdDropdown.selectedHousehold;
+    this._participant.name = _nameField.name;
+  }
+
+  // informs the user that they need to correct fields in the form
+  void _displayInvalidFormMessage(BuildContext context) {
+    // change wording of message
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Participant Saved")));
-    // return back to the home screen
-    Navigator.pop(context, true);
+        .showSnackBar(SnackBar(content: Text("Please fix invalid fields")));
   }
 
   void _deleteParticipant(BuildContext context) {

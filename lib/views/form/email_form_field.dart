@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class EmailFormField extends StatelessWidget {
+  // TODO fix email validation to include .domain
   final String _emailPattern =
       r"^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]{1,64}@[a-zA-Z0-9-.]{1,255}";
 
@@ -28,7 +29,7 @@ class EmailFormField extends StatelessWidget {
   String _validateEmail(String email) {
     RegExp regex = RegExp(_emailPattern);
 
-    if (!(regex.stringMatch(email) == email)) {
+    if (!(regex.hasMatch(email))) {
       return _errorMessage;
     }
     // if email is valid return null
