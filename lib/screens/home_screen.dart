@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                ParticipantScreen.withParticipant(participant)));
+                ParticipantScreen.withParticipant(_households, participant)));
     // refresh the list of participants
     updateParticipantList();
   }
@@ -126,8 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (tabIndex == PARTICIPANT_TAB_INDEX) {
       // navigate to the participant screen
       // and wait for the return
-      await Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ParticipantScreen()));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ParticipantScreen(_households)));
       // when we return from the participant screen refresh the list of participants
       updateParticipantList();
     } else {

@@ -2,10 +2,8 @@
 * This screen allows the user to define a new household
 */
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/services/household_service.dart';
-import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
 import 'package:secret_santa_app/views/layout/one_column_layout.dart';
 
 class HouseholdScreen extends StatelessWidget {
@@ -28,7 +26,7 @@ class HouseholdScreen extends StatelessWidget {
 
   HouseholdScreen({Key key})
       : _editEnabled = false,
-        _household = Household(0, ""),
+        _household = Household(null, ""),
         super(key: key);
 
   HouseholdScreen.withHousehold(this._household) : _editEnabled = true;
@@ -41,12 +39,11 @@ class HouseholdScreen extends StatelessWidget {
     return null;
   }
 
-  // TODO fix this method it's not incrementing the hosuehold id on insert
   void _saveHousehold(BuildContext context) async {
     if (_key.currentState.validate()) {
       _household.household = _textController.text;
       try {
-        if (_household.id != 0) {
+        if (_household.id != null) {
           await householdService.update(_household);
         } else {
           await householdService.create(_household);

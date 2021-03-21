@@ -4,6 +4,7 @@
 * as well as deleting the participant
 */
 import 'package:flutter/material.dart';
+import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/models/participant.dart';
 import 'package:secret_santa_app/services/participant_service.dart';
 import 'package:secret_santa_app/views/form/email_form_field.dart';
@@ -29,26 +30,28 @@ class ParticipantScreen extends StatelessWidget {
 
   final ParticipantService participantService = ParticipantService();
 
-  static final _households = ["Home", "Cousins House", "Grandma's House"];
+  final List<Household> _households;
 
   Participant _participant;
 
-  ParticipantScreen({Key key})
+  ParticipantScreen(this._households, {Key key})
       : _editMode = false,
         _nameField = NameFormField(),
         _emailField = EmailFormField(),
-        _householdDropdown = HouseholdDropdown(_households),
+        _householdDropdown = HouseholdDropdown(),
         super(key: key) {
-    this._participant = Participant(0, "", "", "");
+    this._participant = Participant(null, "", "", "");
+    _householdDropdown.households = _households;
   }
 
-  ParticipantScreen.withParticipant(Participant participant)
+  ParticipantScreen.withParticipant(this._households, Participant participant)
       : _editMode = true,
         _nameField = NameFormField.withIntialName(participant.name),
         _emailField = EmailFormField.withInitialEmail(participant.email),
-        _householdDropdown = HouseholdDropdown.withInitialHousehold(
-            _households, participant.household) {
+        _householdDropdown =
+            HouseholdDropdown.withInitialHousehold(participant.household) {
     this._participant = participant;
+    _householdDropdown.households = _households;
   }
 
   // Saves the current participant
@@ -58,7 +61,7 @@ class ParticipantScreen extends StatelessWidget {
       _setParticipantFields();
       // if the participant already has an id then we need to update it
       try {
-        if (_participant.id != 0) {
+        if (_participant.id != null) {
           await participantService.update(_participant);
         }
         // if there is no id then we need to create the participant
