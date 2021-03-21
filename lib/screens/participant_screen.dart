@@ -56,6 +56,7 @@ class ParticipantScreen extends StatelessWidget {
     if (_key.currentState.validate()) {
       // update the participant object with information from the form
       _setParticipantFields();
+      // TODO add error handling for if there is an error in the database
       // if the participant already has an id then we need to update it
       if (_participant.id != 0) {
         participantService.update(_participant);
@@ -69,7 +70,7 @@ class ParticipantScreen extends StatelessWidget {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Participant Saved")));
       // return back to the home screen
-      Navigator.pop(context, true);
+      Navigator.pop(context);
     } else {
       _displayInvalidFormMessage(context);
     }
@@ -90,7 +91,14 @@ class ParticipantScreen extends StatelessWidget {
   }
 
   void _deleteParticipant(BuildContext context) {
-    // TODO wrie code for delete participant
+    // TODO add error handling
+    participantService.delete(_participant);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Participant Deleted")));
+    // get out of the dialog
+    Navigator.pop(context);
+    // pop again to get back to the home screen
+    Navigator.pop(context);
   }
 
   // called when the delete button is pressed
