@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 class EmailFormField extends StatelessWidget {
   // TODO fix email validation to include .domain
   final String _emailPattern =
-      r"^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]{1,64}@[a-zA-Z0-9-.]{1,255}";
+      r"^[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~.-]{1,64}@[a-zA-Z0-9-.]{1,255}";
 
   final String _errorMessage = "Error: invalid email";
 
