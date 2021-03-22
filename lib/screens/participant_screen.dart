@@ -137,7 +137,7 @@ class ParticipantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // TODO add toolbar to the app bar
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(this.title),
         actions: _editMode

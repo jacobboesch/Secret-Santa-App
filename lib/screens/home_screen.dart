@@ -192,7 +192,6 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: _householdItemBuilder)
         ],
       ),
-      // TODO have action button not block the list view
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             _onSendEmailButtonTapped(context);

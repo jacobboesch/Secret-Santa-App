@@ -72,8 +72,6 @@ class HouseholdScreen extends StatelessWidget {
     }
   }
 
-  // TODO add error message or CASCADE when household is deleted and there's still
-  // participants in need of that house hold
   void _deleteHousehold(BuildContext context) async {
     try {
       await householdService.delete(_household);
@@ -94,8 +92,6 @@ class HouseholdScreen extends StatelessWidget {
   }
 
   // called when the delete button is pressed
-  // TODO could possibly replace this with it's own class
-  // and lambda function
   void _confirmDelete(BuildContext context) {
     showDialog(
         context: context,
@@ -116,6 +112,7 @@ class HouseholdScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Household"),
         actions: _editEnabled
