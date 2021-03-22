@@ -198,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _onSendEmailButtonTapped(context);
           },
           label: Text("Send Emails")),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
