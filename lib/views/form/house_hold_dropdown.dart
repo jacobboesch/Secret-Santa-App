@@ -42,7 +42,7 @@ class _HouseholdDropdownState extends State<HouseholdDropdown> {
 
   _HouseholdDropdownState(this._selectedHousehold);
 
-  List<DropdownMenuItem> _dropdownItems = [];
+  List<DropdownMenuItem<String>> _dropdownItems = [];
 
   @override
   void initState() {
@@ -54,21 +54,30 @@ class _HouseholdDropdownState extends State<HouseholdDropdown> {
     // add dropdown items to the list
     _dropdownItems.clear();
     for (String household in widget._households) {
-      _dropdownItems
-          .add(new DropdownMenuItem(value: household, child: Text(household)));
+      _dropdownItems.add(new DropdownMenuItem<String>(
+          value: household, child: Text(household)));
     }
     setState(() {});
   }
 
+  String _validateHousehold(String value) {
+    if (value == null) {
+      return "*Required";
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField(
+    return DropdownButtonFormField<String>(
+      validator: _validateHousehold,
       value: _selectedHousehold,
       items: _dropdownItems,
       decoration: InputDecoration(
-        labelText: "Household",
-        border: OutlineInputBorder(),
-      ),
+          labelText: "Household",
+          border: OutlineInputBorder(),
+          helperText: "*Required"),
       // update the selected household when dropdown changes
       onChanged: (value) {
         setState(() {
