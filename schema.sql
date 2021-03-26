@@ -18,8 +18,12 @@ CREATE TABLE IF NOT EXISTS participants(
 CREATE TABLE IF NOT EXISTS participant_households(
     participant INTEGER NOT NULL,
     household INTEGER NOT NULL,
-    FOREIGN KEY(participant) REFERENCES participants(id),
-    FOREIGN KEY(household) REFERENCES households(id),
+    FOREIGN KEY(participant) REFERENCES participants(id) 
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY(household) REFERENCES households(id) 
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     PRIMARY KEY (participant, household)
 );
 
@@ -28,8 +32,12 @@ CREATE TABLE IF NOT EXISTS giftee_history(
     participant INTEGER NOT NULL,
     giftee INTEGER NOT NULL,
     date_selected TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY(participant) REFERENCES participants(id),
+    FOREIGN KEY(participant) REFERENCES participants(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY(giftee) REFERENCES participants(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- participant view and rules
@@ -60,10 +68,4 @@ CREATE TRIGGER delete_vw_participants
 -- used to make sure no one gets the same person from the previous year
 CREATE VIEW vw_recent_giftee_history AS
 SELECT participant, giftee FROM giftee_history WHERE date_selected = (SELECT max(date_selected) FROM giftee_history);
-
--- List all possible giftee's 
--- Can't be in the same household, can't be the same person, can't have someone from the previous
--- run
-SELECT P.id AS id, COUNT(G.id) AS num_possible_giftees, group_concat(G.id) AS possible_giftees FROM participants AS P, participants AS G WHERE P.id != G.id AND P.household != G.household AND ( (P.id, G.id) NOT IN (SELECT * FROM vw_recent_giftee_history)) GROUP BY P.id ORDER BY num_possible_giftees ASC;
-
 

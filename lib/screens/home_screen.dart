@@ -10,11 +10,14 @@
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:secret_santa_app/models/household.dart';
+import 'package:secret_santa_app/models/selection.dart';
 import 'package:secret_santa_app/screens/household_screen.dart';
 import 'package:secret_santa_app/screens/participant_screen.dart';
 import 'package:secret_santa_app/models/participant.dart';
+import 'package:secret_santa_app/services/email_service.dart';
 import 'package:secret_santa_app/services/household_service.dart';
 import 'package:secret_santa_app/services/participant_service.dart';
+import 'package:secret_santa_app/services/selection_service.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -30,8 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Participant> _participants = [];
   List<Household> _households = [];
 
+  bool _isProcessingEmails = false;
+
   final ParticipantService _participantService = ParticipantService();
   final HouseholdService _householdService = HouseholdService();
+  final SelectionService _selectionService = SelectionService();
+  final EmailService _emailService = EmailService();
   // tab index
   static const int PARTICIPANT_TAB_INDEX = 0;
   static const int HOUSEHOLD_TAB_INDEX = 1;
@@ -145,10 +152,61 @@ class _HomeScreenState extends State<HomeScreen> {
   // called when the send emails button is clicked
   // prompts the user to confirm wheather or not whey want to send the
   // emails then sends out the emails to all of the participants
-  void _onSendEmailButtonTapped(BuildContext context) {
-    //TODO replace with actual code
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Send Email Button Cliked")));
+  void _onSendEmailButtonTapped(BuildContext context) async {
+    // have the user confirm wheather or not they want to send the emails
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("Send Emails?"),
+              content: Text(
+                  "Are you sure you want to email all participants their randomly selected giftee?"),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: Text("NO")),
+                TextButton(
+                    onPressed: () => _emailParticiants(context),
+                    child: Text("YES")),
+              ],
+            ));
+  }
+
+  // called when user confirms they would like to email participants
+  // disables the email button
+  // shows loading circle along with processing message
+  // emails participants
+  // removes the loading circle, enables the button
+  // displays success or error message
+  void _emailParticiants(BuildContext context) async {
+    // pop out of the dialog box
+    Navigator.pop(context);
+    try {
+      // disable the send email button
+      _isProcessingEmails = true;
+      setState(() {});
+      // display processing message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Selecting giftees..."),
+      ));
+      List<Selection> selections = await _selectionService.fetchSelections();
+      // display error message if selections is empty
+      if (selections.isEmpty) {
+        throw Exception("Unable to match all participants with a giftee");
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Sending Emails...")));
+      }
+      await _emailService.emailParticipants(selections);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Emails sent")));
+    } catch (e) {
+      // TODO change to custom exception
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      // enable the email button again
+      _isProcessingEmails = false;
+      setState(() {});
+    }
   }
 
   @override
@@ -192,11 +250,15 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: _householdItemBuilder)
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            _onSendEmailButtonTapped(context);
-          },
-          label: Text("Send Emails")),
+      floatingActionButton: AnimatedOpacity(
+        child: FloatingActionButton.extended(
+            onPressed: () {
+              _onSendEmailButtonTapped(context);
+            },
+            label: Text("Send Emails")),
+        opacity: _isProcessingEmails ? 0 : 1,
+        duration: Duration(milliseconds: 100),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }

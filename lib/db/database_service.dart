@@ -30,7 +30,7 @@ class DatabaseService {
     }
     // TODO refactor and fix this method
     Directory directory = await getApplicationDocumentsDirectory();
-    var dbPath = join(directory.path, "secret_santa_database_2.db");
+    var dbPath = join(directory.path, "secret_santa_database_6.db");
 
     bool dbExists = await File(dbPath).exists();
 
@@ -46,6 +46,8 @@ class DatabaseService {
     }
     // open the database
     _database = await openDatabase(dbPath);
+    // Execute this statement since by default foreign key checks are off when database is opened
+    _database.execute("PRAGMA foreign_keys=ON");
 
     return _database;
   }
