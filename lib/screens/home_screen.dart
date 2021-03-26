@@ -9,6 +9,7 @@
 // imports
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:secret_santa_app/exceptions/error_exception.dart';
 import 'package:secret_santa_app/models/household.dart';
 import 'package:secret_santa_app/models/selection.dart';
 import 'package:secret_santa_app/screens/household_screen.dart';
@@ -39,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final HouseholdService _householdService = HouseholdService();
   final SelectionService _selectionService = SelectionService();
   final EmailService _emailService = EmailService();
+  // global key for the screen to keep track of the current state
+  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   // tab index
   static const int PARTICIPANT_TAB_INDEX = 0;
   static const int HOUSEHOLD_TAB_INDEX = 1;
@@ -164,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 TextButton(
                     onPressed: () => Navigator.pop(context), child: Text("NO")),
                 TextButton(
-                    onPressed: () => _emailParticiants(context),
+                    onPressed: () => {_emailParticiants(context)},
                     child: Text("YES")),
               ],
             ));
@@ -184,24 +187,27 @@ class _HomeScreenState extends State<HomeScreen> {
       _isProcessingEmails = true;
       setState(() {});
       // display processing message
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Selecting giftees..."),
-      ));
       List<Selection> selections = await _selectionService.fetchSelections();
       // display error message if selections is empty
       if (selections.isEmpty) {
-        throw Exception("Unable to match all participants with a giftee");
+        throw ErrorException(
+            "Error: Unable to match all participants with a giftee");
       } else {
-        ScaffoldMessenger.of(context)
+        ScaffoldMessenger.of(_key.currentState.context)
             .showSnackBar(SnackBar(content: Text("Sending Emails...")));
       }
       await _emailService.emailParticipants(selections);
-      ScaffoldMessenger.of(context)
+      ScaffoldMessenger.of(_key.currentState.context)
           .showSnackBar(SnackBar(content: Text("Emails sent")));
+    } on ErrorException catch (e) {
+      print(e);
+      ScaffoldMessenger.of(_key.currentState.context)
+          .showSnackBar(SnackBar(content: Text(e.msg)));
     } catch (e) {
-      // TODO change to custom exception
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+      print(e);
+      ScaffoldMessenger.of(_key.currentState.context).showSnackBar(SnackBar(
+          content:
+              Text("Error: Unable to send emails please try again latter")));
     } finally {
       // enable the email button again
       _isProcessingEmails = false;
@@ -212,6 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _key,
       appBar: AppBar(
           title: Text(title),
           actions: [
