@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS participants(
     email VARCHAR(320) NOT NULL,
     FOREIGN KEY(household) REFERENCES households(id) 
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    UNIQUE(name)
 );
 
 CREATE TABLE IF NOT EXISTS participant_households(

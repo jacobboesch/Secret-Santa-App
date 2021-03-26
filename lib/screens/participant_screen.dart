@@ -11,6 +11,7 @@ import 'package:secret_santa_app/views/form/email_form_field.dart';
 import 'package:secret_santa_app/views/form/house_hold_dropdown.dart';
 import 'package:secret_santa_app/views/layout/one_column_layout.dart';
 import 'package:secret_santa_app/views/form/name_form_field.dart';
+import 'package:sqflite/sqflite.dart';
 
 // ignore: must_be_immutable
 class ParticipantScreen extends StatelessWidget {
@@ -71,13 +72,29 @@ class ParticipantScreen extends StatelessWidget {
         // show that participant saved
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Participant Saved")));
+        // return back to the home screen
+        Navigator.pop(context);
+      } on DatabaseException catch (e) {
+        print(e);
+        // if we have a duplicate name which gets thrown as a Unique Constraint failure
+        if (e.getResultCode() == 2067) {
+          // tell the name field that the name is already taken so that it will display
+          // the error properly
+          _nameField.takenName = _nameField.name;
+          // display the taken name error
+          _key.currentState.validate();
+        }
+        // have it go through the unexpect error block
+        else {
+          throw Exception("Unexpected");
+        }
       } catch (e) {
         print(e);
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Unexpected Error Saving Participant")));
+        // return back to the home screen
+        Navigator.pop(context);
       }
-      // return back to the home screen
-      Navigator.pop(context);
     } else {
       _displayInvalidFormMessage(context);
     }
@@ -125,10 +142,7 @@ class ParticipantScreen extends StatelessWidget {
                     onPressed: () => {Navigator.pop(context)},
                     child: Text(_deleteConfirmationCancelText)),
                 TextButton(
-                    onPressed: () => {
-                          // TODO replace with async call
-                          _deleteParticipant(context)
-                        },
+                    onPressed: () => {_deleteParticipant(context)},
                     child: Text(_deleteConfirmationConfirmText))
               ],
             ));

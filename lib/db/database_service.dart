@@ -30,7 +30,7 @@ class DatabaseService {
     }
     // TODO refactor and fix this method
     Directory directory = await getApplicationDocumentsDirectory();
-    var dbPath = join(directory.path, "secret_santa_database_6.db");
+    var dbPath = join(directory.path, "secret_santa_database_7.db");
 
     bool dbExists = await File(dbPath).exists();
 

@@ -13,6 +13,8 @@ class NameFormField extends StatelessWidget {
 
   final String invalidNameMessage = "Error: Only alphabetical allowed";
 
+  final String nameTakenMessage = "Error: Name already exists";
+
   final String _label = "Name";
 
   final String _helperText = "*Required";
@@ -20,6 +22,9 @@ class NameFormField extends StatelessWidget {
   final TextEditingController textController = TextEditingController();
 
   final String _initialName;
+
+  // used to determine if the name is already taken
+  String _takenName = "";
 
   NameFormField.withIntialName(this._initialName);
 
@@ -35,13 +40,24 @@ class NameFormField extends StatelessWidget {
       return emptyErrorMessage;
     } else if (!(regex.stringMatch(name) == name)) {
       return invalidNameMessage;
+    } else if (_takenName.isNotEmpty && name == _takenName) {
+      return nameTakenMessage;
     }
+
     // if everything is good return null
     return null;
   }
 
   String get name {
     return this.textController.text;
+  }
+
+  set takenName(String name) {
+    this._takenName = name;
+  }
+
+  get takenName {
+    return this._takenName;
   }
 
   @override
