@@ -2,7 +2,7 @@
     package="com.example.secret_santa_app">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="secret_santa_app"
+        android:label="Secret Santa"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false">
         <activity
