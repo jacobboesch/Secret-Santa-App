@@ -8,17 +8,18 @@ import 'package:secret_santa_app/views/layout/one_column_layout.dart';
 import 'package:sqflite/sqflite.dart';
 
 class HouseholdScreen extends StatelessWidget {
-  final String _emptyErrorMessage = "Error: household can't be empty";
+  final String _emptyErrorMessage = "Error: group name can't be empty";
   final TextEditingController _textController = TextEditingController();
-  final String _label = "Household";
+  final String _label = "Group Name";
+  // TODO add helper group
   final String _helperText = "*Required";
 
   final bool _editEnabled;
   final Household _household;
 
-  final String _deleteConfirmationTitle = "Delete household?";
+  final String _deleteConfirmationTitle = "Delete group?";
   final String _deleteConfirmationHelperText =
-      "The household will be permanently removed from the list of households, Along with any participants that live in this household.";
+      "The group will be permanently removed from the list of groups, Along with any participants that belong to this group.";
   final String _deleteConfirmationCancelText = "CANCEL";
   final String _deleteConfirmationConfirmText = "DELETE";
   final HouseholdService householdService = HouseholdService();
@@ -50,7 +51,7 @@ class HouseholdScreen extends StatelessWidget {
           await householdService.create(_household);
         }
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Household saved")));
+            .showSnackBar(SnackBar(content: Text("Group saved")));
       } on DatabaseException catch (e) {
         // if the error is that a unqiue contraint is voilated then
         // we know that for this table it's becuase there's already a household
@@ -59,14 +60,14 @@ class HouseholdScreen extends StatelessWidget {
           // Since the household already exists we'll just inform the user
           // that the household is saved. No need for an error message
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("Household saved")));
+              .showSnackBar(SnackBar(content: Text("Group saved")));
         } else {
           _displayUnexpectedErrorMessage(context);
         }
       } catch (e) {
         print(e);
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Unexpected Error Saving Household")));
+            SnackBar(content: Text("Unexpected Error Saving Group")));
       }
       Navigator.pop(context);
     }
@@ -76,7 +77,7 @@ class HouseholdScreen extends StatelessWidget {
     try {
       await householdService.delete(_household);
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Household Deleted")));
+          .showSnackBar(SnackBar(content: Text("Group Deleted")));
     } catch (e) {
       _displayUnexpectedErrorMessage(context);
     }
@@ -88,7 +89,7 @@ class HouseholdScreen extends StatelessWidget {
 
   void _displayUnexpectedErrorMessage(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Unexpected Error Deleting Household")));
+        SnackBar(content: Text("Unexpected Error Deleting Group")));
   }
 
   // called when the delete button is pressed
@@ -114,7 +115,7 @@ class HouseholdScreen extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Household"),
+        title: Text("Group"),
         actions: _editEnabled
             ? [
                 // Delete button

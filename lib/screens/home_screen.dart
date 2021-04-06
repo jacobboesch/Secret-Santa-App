@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // constants
   final String title = "Secret Santa App";
   final String participantTabTitle = "Participants";
-  final String householdTabTitle = "Households";
+  final String householdTabTitle = "Groups";
   List<Participant> _participants = [];
   List<Household> _households = [];
 
@@ -233,10 +233,10 @@ class _HomeScreenState extends State<HomeScreen> {
           bottom: TabBar(
             tabs: [
               // participant tab
-              Tab(icon: Icon(Icons.group), text: participantTabTitle),
+              Tab(icon: Icon(Icons.person), text: participantTabTitle),
               // household tab
               Tab(
-                icon: Icon(Icons.house),
+                icon: Icon(Icons.group),
                 text: householdTabTitle,
               )
             ],
